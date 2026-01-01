@@ -10,6 +10,10 @@ from data_processor import(
 )
 from visualisation import plot_category_distribution
 from visualisation import plot_views_histogram
+from visualisation import plot_likes_histogram
+from visualisation import plot_comments_histogram
+from visualisation import plot_engagement_histogram
+
 #loading data from CSV file and printing number of rows
 data = load_data("youtube_trending_videos.csv")
 print("Data loaded successfully.")
@@ -31,6 +35,15 @@ def display_top_10(videos):
         print("Views:", video["views"])
         print("Likes:", video["likes"])
         print("Comments:", video["comment_count"])
+
+# Shows histogram submenu options
+def show_hisogram_menu():
+    print("\n--- HISTOGRAM MENU ---")
+    print("1. Views")
+    print("2. Likes")
+    print("3. Comments")
+    print("4. Engagement")
+    print("0. Back to main menu")
 
 while True:
 
@@ -96,7 +109,24 @@ while True:
         plot_category_distribution(category_counts, save=True)
 
     elif choice == "6":
-        plot_views_histogram(data)
+         while True:
+            show_hisogram_menu()
+            histo_choice = input("Choose histogram option: ")
+
+            if histo_choice == "1":
+                plot_views_histogram(data)
+
+            elif histo_choice == "2":
+                plot_likes_histogram(data)
+
+            elif histo_choice == "3":
+                plot_comments_histogram(data)
+
+            elif histo_choice == "4":
+                plot_engagement_histogram(data)
+
+            elif histo_choice == "0" or histo_choice.lower() == "exit":
+                break
 
     elif choice == "0" or choice.lower() == "exit":
         print("Exiting program.")
