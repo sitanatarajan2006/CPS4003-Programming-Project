@@ -1,6 +1,7 @@
 from data_loader import load_data
 from data_processor import(
     count_total_videos,
+    find_video,
     unique_categories
 )
 
@@ -12,6 +13,7 @@ while True:
 
     print("1.Show total number of videos")
     print("2. Show number of videos per category")
+    print("3.Find video by ID or title")
     print("0.Exit")
     choice = input("Enter your choice: ")
 
@@ -23,6 +25,17 @@ while True:
         category_counts = unique_categories(data)
         for category in category_counts:
             print(category, "->", category_counts[category])
+
+    elif choice == "3":
+        search_value = input("Enter the video's ID or title: ")
+        video = find_video(data, search_value)
+
+        if video:
+            print("\nVideo found:")
+            for key in video:
+                print(key, ":", video[key])
+        else:
+            print("Video not found.")
 
     elif choice == "0" or choice.lower() == "exit":
         print("Exiting program.")
