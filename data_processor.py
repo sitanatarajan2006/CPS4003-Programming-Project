@@ -1,8 +1,6 @@
 def count_total_videos(data):
     return len(data)
 
-
-
 def unique_categories(data):
     category_count = {}
     for row in data:

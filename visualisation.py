@@ -16,11 +16,40 @@ def plot_views_histogram(data):
 
     for row in data:
 
-        views.append(int(row["views"]) / 1_000_000)
+        views.append(int(row["views"]) / 10_000)
 
     plt.figure()
     plt.hist(views, bins=20)
     plt.title("Distribution of Video Views")
-    plt.xlabel("Number of Views (millions)")
+    plt.xlabel("Number of Views (ten-thousands)")
+    plt.ylabel("Number of Videos")
+    plt.show()
+
+def plot_likes_histogram(data):
+
+    likes = []
+
+    for row in data:
+
+        likes.append(int(row["likes"]) / 10_000)
+
+    plt.figure()
+    plt.hist(likes, bins=20)
+    plt.title("Distribution of Video Likes")
+    plt.xlabel("Number of Likes (ten-thousands)")
+    plt.ylabel("Number of Videos")
+    plt.show()
+
+def plot_comments_histogram(data):
+
+    comments = []
+
+    for row in data:
+
+        comments.append(int(row["comment_count"]) / 10_000)
+    plt.figure()
+    plt.hist(comments, bins=20)
+    plt.title("Distribution of Video Comments")
+    plt.xlabel("Number of Comments (ten-thousands)")
     plt.ylabel("Number of Videos")
     plt.show()
