@@ -12,6 +12,7 @@ from visualisation import plot_category_distribution
 from visualisation import plot_views_histogram
 from visualisation import plot_likes_histogram
 from visualisation import plot_comments_histogram
+from visualisation import plot_engagement_histogram
 
 #loading data from CSV file and printing number of rows
 data = load_data("youtube_trending_videos.csv")
@@ -41,6 +42,7 @@ def show_hisogram_menu():
     print("1. Views")
     print("2. Likes")
     print("3. Comments")
+    print("4. Engagement")
     print("0. Back to main menu")
 
 while True:
@@ -119,6 +121,9 @@ while True:
 
             elif histo_choice == "3":
                 plot_comments_histogram(data)
+
+            elif histo_choice == "4":
+                plot_engagement_histogram(data)
 
             elif histo_choice == "0" or histo_choice.lower() == "exit":
                 break

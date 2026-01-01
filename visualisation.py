@@ -53,3 +53,22 @@ def plot_comments_histogram(data):
     plt.xlabel("Number of Comments (ten-thousands)")
     plt.ylabel("Number of Videos")
     plt.show()
+
+def plot_engagement_histogram(data):
+
+    engagement = []
+    def calculate_engagement(row):
+        views = int(row["views"])
+        likes = int(row["likes"])
+        comments = int(row["comment_count"])
+        return views + likes + comments
+
+    for row in data:
+
+        engagement.append(calculate_engagement(row) / 1_000_000)
+    plt.figure()
+    plt.hist(engagement, bins=20)
+    plt.title("Distribution of Video Engagement")
+    plt.xlabel("Number of Comments (millions)")
+    plt.ylabel("Number of Videos")
+    plt.show()
