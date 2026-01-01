@@ -21,3 +21,45 @@ def find_video(data, search_value):
             return row
 
     return None
+
+def get_top_10_by_total_engagement(data):
+    # Rank videos using views + likes + comments
+
+    def score(row):
+        views = int(row["views"])
+        likes = int(row["likes"])
+        comments = int(row["comment_count"])
+        return views + likes + comments
+
+    sorted_videos = sorted(data, key=score, reverse=True)
+    return sorted_videos[:10]
+
+
+def get_top_10_by_views(data):
+    # Rank videos by views only
+
+    def key_func(row):
+        return int(row["views"])
+
+    sorted_videos = sorted(data, key=key_func, reverse=True)
+    return sorted_videos[:10]
+
+
+def get_top_10_by_likes(data):
+    # Rank videos by likes only
+
+    def key_func(row):
+        return int(row["likes"])
+
+    sorted_videos = sorted(data, key=key_func, reverse=True)
+    return sorted_videos[:10]
+
+
+def get_top_10_by_comments(data):
+    # Rank videos by comments only
+
+    def key_func(row):
+        return int(row["comment_count"])
+
+    sorted_videos = sorted(data, key=key_func, reverse=True)
+    return sorted_videos[:10]
