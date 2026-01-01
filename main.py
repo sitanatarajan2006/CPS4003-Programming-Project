@@ -2,12 +2,34 @@ from data_loader import load_data
 from data_processor import(
     count_total_videos,
     find_video,
-    unique_categories
+    unique_categories,
+    get_top_10_by_views,
+    get_top_10_by_likes,
+    get_top_10_by_comments,
+    get_top_10_by_total_engagement
 )
 
 #loading data from CSV file and printing number of rows
 data = load_data("youtube_trending_videos.csv")
 print("Data loaded successfully.")
+
+# Shows trending submenu options
+def show_trending_menu():
+    print("\n--- TRENDING VIDEOS MENU ---")
+    print("1. Top 10 by views")
+    print("2. Top 10 by likes")
+    print("3. Top 10 by comments")
+    print("4. Top 10 by engagement (views + likes + comments)")
+    print("0. Back to main menu")
+
+# Lists rank and video information
+def display_top_10(videos):
+    for i, video in enumerate(videos, start=1):
+        print("\nRank:", i)
+        print("Title:", video["title"])
+        print("Views:", video["views"])
+        print("Likes:", video["likes"])
+        print("Comments:", video["comment_count"])
 
 while True:
 
@@ -37,6 +59,7 @@ while True:
                 print(key, ":", video[key])
         else:
             print("Video not found.")
+
     elif choice == "4":
 
         while True:
@@ -47,35 +70,19 @@ while True:
                 top_10 = get_top_10_by_views(data)
                 display_top_10(top_10)
 
-                save = input("Export to CSV? (y/n): ")
-                if save.lower() == "y":
-                    export_top_10_to_csv(top_10, "top_10_by_views.csv")
-
             elif sub_choice == "2":
                 top_10 = get_top_10_by_likes(data)
                 display_top_10(top_10)
-
-                save = input("Export to CSV? (y/n): ")
-                if save.lower() == "y":
-                    export_top_10_to_csv(top_10, "top_10_by_likes.csv")
 
             elif sub_choice == "3":
                 top_10 = get_top_10_by_comments(data)
                 display_top_10(top_10)
 
-                save = input("Export to CSV? (y/n): ")
-                if save.lower() == "y":
-                    export_top_10_to_csv(top_10, "top_10_by_comments.csv")
-
             elif sub_choice == "4":
                 top_10 = get_top_10_by_total_engagement(data)
                 display_top_10(top_10)
 
-                save = input("Export to CSV? (y/n): ")
-                if save.lower() == "y":
-                    export_top_10_to_csv(top_10, "top_10_by_engagement.csv")
-
-            elif sub_choice == "0":
+            elif sub_choice == "0" or sub_choice.lower() == "exit":
                 break
 
             else:
