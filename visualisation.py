@@ -16,12 +16,12 @@ def plot_views_histogram(data):
 
     for row in data:
 
-        views.append(int(row["views"]) / 10_000)
+        views.append(int(row["views"]) / 1000000)
 
     plt.figure()
     plt.hist(views, bins=20)
     plt.title("Distribution of Video Views")
-    plt.xlabel("Number of Views (ten-thousands)")
+    plt.xlabel("Number of Views (millions)")
     plt.ylabel("Number of Videos")
     plt.show()
 
@@ -31,7 +31,7 @@ def plot_likes_histogram(data):
 
     for row in data:
 
-        likes.append(int(row["likes"]) / 10_000)
+        likes.append(int(row["likes"]) / 10000)
 
     plt.figure()
     plt.hist(likes, bins=20)
@@ -46,7 +46,7 @@ def plot_comments_histogram(data):
 
     for row in data:
 
-        comments.append(int(row["comment_count"]) / 10_000)
+        comments.append(int(row["comment_count"]) / 10000)
     plt.figure()
     plt.hist(comments, bins=20)
     plt.title("Distribution of Video Comments")
@@ -65,7 +65,7 @@ def plot_engagement_histogram(data):
 
     for row in data:
 
-        engagement.append(calculate_engagement(row) / 1_000_000)
+        engagement.append(calculate_engagement(row) / 1000000)
     plt.figure()
     plt.hist(engagement, bins=20)
     plt.title("Distribution of Video Engagement")

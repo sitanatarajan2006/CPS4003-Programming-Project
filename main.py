@@ -13,10 +13,11 @@ from visualisation import plot_views_histogram
 from visualisation import plot_likes_histogram
 from visualisation import plot_comments_histogram
 from visualisation import plot_engagement_histogram
+from data_exporter import export_top_10_to_csv, export_video_to_json
 
 #loading data from CSV file and printing number of rows
 data = load_data("youtube_trending_videos.csv")
-print("Data loaded successfully.")
+print("\nData loaded successfully.")
 
 # Shows trending submenu options
 def show_trending_menu():
@@ -47,8 +48,8 @@ def show_hisogram_menu():
 
 while True:
 
-    print("1.Show total number of videos")
-    print("2. Show number of videos per category")
+    print("\n1.Show total number of videos")
+    print("2.Show number of videos per category")
     print("3.Find video by ID or title")
     print("4.Show top 10 trending videos")
     print("5.Show pie chart")
@@ -57,52 +58,69 @@ while True:
     choice = input("Enter your choice: ")
 
     if choice == '1':
-        print("Total number of videos:", count_total_videos(data))
+        print("\nTotal number of videos:", count_total_videos(data))
 
     elif choice == '2':
-        print("Number of videos per category:")
+        print("\nNumber of videos per category:")
         category_counts = unique_categories(data)
         for category in category_counts:
             print(category, "->", category_counts[category])
 
     elif choice == "3":
-        search_value = input("Enter the video's ID or title: ")
+        search_value = input("\nEnter the video's ID or title: ")
         video = find_video(data, search_value)
 
         if video:
             print("\nVideo found:")
             for key in video:
                 print(key, ":", video[key])
+            save = input("\nExport this video to JSON? (y/n): ")
+            if save.lower() == "y":
+                filename = f"{video['channel_title']}.json"
+                export_video_to_json(video, filename)
         else:
-            print("Video not found.")
+            print("\nVideo not found.")
+
 
     elif choice == "4":
 
         while True:
             show_trending_menu()
-            sub_choice = input("Choose trending option: ")
+            sub_choice = input("\nChoose trending option: ")
 
             if sub_choice == "1":
                 top_10 = get_top_10_by_views(data)
                 display_top_10(top_10)
+                save = input("\nExport to CSV? (y/n): ")
+                if save.lower() == "y":
+                    export_top_10_to_csv(top_10, "top_10_by_views.csv")
 
             elif sub_choice == "2":
                 top_10 = get_top_10_by_likes(data)
                 display_top_10(top_10)
+                save = input("\nExport to CSV? (y/n): ")
+                if save.lower() == "y":
+                    export_top_10_to_csv(top_10, "top_10_by_likes.csv")
 
             elif sub_choice == "3":
                 top_10 = get_top_10_by_comments(data)
                 display_top_10(top_10)
+                save = input("\nExport to CSV? (y/n): ")
+                if save.lower() == "y":
+                    export_top_10_to_csv(top_10, "top_10_by_comments.csv")
 
             elif sub_choice == "4":
                 top_10 = get_top_10_by_total_engagement(data)
                 display_top_10(top_10)
+                save = input("\nExport to CSV? (y/n): ")
+                if save.lower() == "y":
+                    export_top_10_to_csv(top_10, "top_10_by_engagement.csv")
 
             elif sub_choice == "0" or sub_choice.lower() == "exit":
                 break
 
             else:
-                print("Invalid trending option.")
+                print("\nInvalid trending option.")
 
     elif choice == "5":
         category_counts = unique_categories(data)
@@ -111,7 +129,7 @@ while True:
     elif choice == "6":
          while True:
             show_hisogram_menu()
-            histo_choice = input("Choose histogram option: ")
+            histo_choice = input("\nChoose histogram option: ")
 
             if histo_choice == "1":
                 plot_views_histogram(data)
@@ -129,8 +147,8 @@ while True:
                 break
 
     elif choice == "0" or choice.lower() == "exit":
-        print("Exiting program.")
+        print("\nExiting program.")
         break
 
     else:
-        print("Invalid option. Please try again.")
+        print("\nInvalid option. Please try again.")
