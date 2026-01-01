@@ -8,6 +8,7 @@ from data_processor import(
     get_top_10_by_comments,
     get_top_10_by_total_engagement
 )
+from visualisation import plot_category_distribution
 
 #loading data from CSV file and printing number of rows
 data = load_data("youtube_trending_videos.csv")
@@ -37,6 +38,7 @@ while True:
     print("2. Show number of videos per category")
     print("3.Find video by ID or title")
     print("4.Show top 10 trending videos")
+    print("5 Show pie chart")
     print("0.Exit")
     choice = input("Enter your choice: ")
 
@@ -87,6 +89,10 @@ while True:
 
             else:
                 print("Invalid trending option.")
+
+    elif choice == "5":
+        category_counts = unique_categories(data)
+        plot_category_distribution(category_counts, save=True)
 
     elif choice == "0" or choice.lower() == "exit":
         print("Exiting program.")
