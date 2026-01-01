@@ -3,7 +3,7 @@ def count_total_videos(data):
 
 
 
-def count_videos_per_category(data):
+def unique_categories(data):
     category_count = {}
     for row in data:
         category = row["category_id"]
