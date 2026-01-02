@@ -1,4 +1,4 @@
-# This is the main program file that integrates all modules and provides a user interface.
+# This is the main program file that integrates all modules and provides a text user interface.
 # It allows users to load data, view statistics, search for videos, see trending videos, visualize data, and export data.
 
 # Importing all necessary modules
