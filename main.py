@@ -1,9 +1,13 @@
+# This is the main program file that integrates all modules and provides a user interface.
+# It allows users to load data, view statistics, search for videos, see trending videos, visualize data, and export data.
+
+# Importing all necessary modules
 from data_loader import *
 from data_processor import *
 from visualisation import *
 from data_exporter import *
 
-#loading data from CSV file and printing number of rows
+# Loading data from CSV file into the program and lets the user know data is loaded
 data = load_data("youtube_trending_videos.csv")
 print("\nData loaded successfully.")
 
@@ -34,8 +38,8 @@ def show_hisogram_menu():
     print("4. Engagement")
     print("0. Back to main menu")
 
+# Main program loop
 while True:
-    # show main menu options
     print("\n--- MAIN MENU ---")
     print("1.Show total number of videos")
     print("2.Show number of videos per category")
@@ -46,15 +50,18 @@ while True:
     print("0.Exit")
     choice = input("Enter your choice: ")
 
+    # If the user chooses 1 then show total number of videos
     if choice == '1':
         print("\nTotal number of videos:", count_total_videos(data))
 
+    # If the user chooses 2 then show number of videos per category
     elif choice == '2':
         print("\nNumber of videos per category:")
         category_counts = unique_categories(data)
         for category in category_counts:
             print(category, "->", category_counts[category])
 
+    # If the user chooses 3 then find video by ID or title and export to JSON if the user wants to, the JSON will be named after the channel title
     elif choice == "3":
         search_value = input("\nEnter the video's ID or title: ")
         video = find_video(data, search_value)
@@ -70,13 +77,14 @@ while True:
         else:
             print("\nVideo not found.")
 
-
+    # If the user chooses 4 then show trending submenu
     elif choice == "4":
 
         while True:
             show_trending_menu()
             sub_choice = input("\nChoose trending option: ")
 
+            # If the user chooses 1 in the trending submenu then show top 10 by views and export to CSV if the user wants to
             if sub_choice == "1":
                 videos = top_views(data)
                 top_10(videos)
@@ -84,6 +92,7 @@ while True:
                 if save.lower() == "y":
                     export_csv(videos, "top_10_by_views.csv")
 
+            # If the user chooses 2 in the trending submenu then show top 10 by likes and export to CSV if the user wants to
             elif sub_choice == "2":
                 videos = top_likes(data)
                 top_10(videos)
@@ -91,6 +100,7 @@ while True:
                 if save.lower() == "y":
                     export_csv(videos, "top_10_by_likes.csv")
 
+            # If the user chooses 3 in the trending submenu then show top 10 by comments and export to CSV if the user wants to
             elif sub_choice == "3":
                 videos = top_comments(data)
                 top_10(videos)
@@ -98,6 +108,7 @@ while True:
                 if save.lower() == "y":
                     export_csv(videos, "top_10_by_comments.csv")
 
+            # If the user chooses 4 in the trending submenu then show top 10 by engagement and export to CSV if the user wants to
             elif sub_choice == "4":
                 videos = top_engagement(data)
                 top_10(videos)
@@ -105,39 +116,54 @@ while True:
                 if save.lower() == "y":
                     export_csv(videos, "top_10_by_engagement.csv")
 
+            # If the user chooses 0 or types "exit" in lower or upper case then break the trending submenu loop and go back to main menu
             elif sub_choice == "0" or sub_choice.lower() == "exit":
                 break
 
+            # This is to handle anything other than the valid options in the trending submenu
             else:
                 print("\nInvalid trending option.")
 
+    # if the user chooses 5 then show pie chart of video distribution by category
     elif choice == "5":
         category_counts = unique_categories(data)
         plot_category_distribution(category_counts, save=True)
 
+    # If the user chooses 6 then show histogram submenu loop
     elif choice == "6":
          while True:
             show_hisogram_menu()
             histo_choice = input("\nChoose histogram option: ")
 
+            # If the user chooses 1 then show views histogram
             if histo_choice == "1":
                 plot_views_histogram(data)
 
+            # If the user chooses 2 then show likes histogram
             elif histo_choice == "2":
                 plot_likes_histogram(data)
 
+            # If the user chooses 3 then show comments histogram
             elif histo_choice == "3":
                 plot_comments_histogram(data)
 
+            # If the user chooses 4 then show engagement histogram
             elif histo_choice == "4":
                 plot_engagement_histogram(data)
 
+            # If the user chooses 0 or types "exit" in lower or upper case then break the histogram submenu loop and go back to main menu
             elif histo_choice == "0" or histo_choice.lower() == "exit":
                 break
 
+            # This is to handle anything other than the valid options in the histogram submenu
+            else:
+                print("\nInvalid histogram option.")
+
+    # If the user chooses 0 or types "exit" in lower or upper case then exit the program with a message
     elif choice == "0" or choice.lower() == "exit":
         print("\nExiting program.")
         break
 
+    # This is to handle anything other than the valid options in the main menu
     else:
         print("\nInvalid option. Please try again.")
