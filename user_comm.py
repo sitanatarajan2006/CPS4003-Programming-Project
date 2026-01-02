@@ -40,4 +40,13 @@ def start_gui(data):
     home_button = tk.Button(menu_area, text="Home", command=home, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=25, height=2, relief="flat")
     home_button.pack(pady=20, padx=20)
     
+    
+    def show_videos():
+        clear_content()
+        total = count_total_videos(data)
+        videos_label = tk.Label(content_area, text=f"Total number of unique videos: {total}", bg="#89cff1", fg="#003a6b", font=("Courier New", 16), padx=20, pady=20, justify="left")
+        videos_label.pack(pady=20, padx=20, anchor="nw")
+    videos_button = tk.Button(menu_area, text="Show Videos", command=show_videos, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
+    videos_button.pack(pady=20, padx=20)
+    
     app.mainloop()
