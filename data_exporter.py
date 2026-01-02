@@ -2,7 +2,7 @@ import csv
 import json
 
 
-def export_top_10_to_csv(videos, filename):
+def export_csv(videos, filename):
     # Export top 10 videos to a CSV file
 
     if not videos:
@@ -32,8 +32,8 @@ def export_top_10_to_csv(videos, filename):
     print(f"Exported top 10 videos to {filename}")
 
 
-def export_video_to_json(video, filename):
-    # Export a single selected video to JSON
+def export_json(video, filename):
+    # Export a single selected video to JSON file
 
     if not video:
         print("No video to export.")
