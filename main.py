@@ -48,7 +48,7 @@ while True:
     print("5.Show pie chart")
     print("6.Show histogram")
     print("0.Exit")
-    choice = input("Enter your choice: ")
+    choice = input("\nEnter your choice: ")
 
     # If the user chooses 1 then show total number of videos
     if choice == '1':
