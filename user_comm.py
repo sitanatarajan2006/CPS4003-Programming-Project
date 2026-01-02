@@ -1,27 +1,20 @@
 import tkinter as tk
-from tkinter import ttk
 from data_processor import *
 
 def start_gui(data):
 
-    window = tk.Tk()
+    app = tk.Tk()
+    app.title("Youtube Data Analyser")
+    app.geometry("1600x900")
+    app.attributes("-topmost", True)
+    app.after(100, lambda: app.attributes("-topmost", False))
 
-    window.title("Youtube Data Analyzer")
-    window.geometry("640x360")
-    window.attributes("-topmost", True)
-    window.after(100, lambda: window.attributes("-topmost", False))
 
-    title = tk.Label(window, text="Welcome to the Video Data Analyzer", font=("Arial", 16))
-    title.pack(pady=20)
+    left_frame = tk.Frame(app, width=500, bg="#0f5875")
+    left_frame.pack(side=tk.LEFT, fill=tk.Y)
 
-    label = tk.Label(window, text="Click for total unique videos.", font=("Arial", 12))
-    label.pack(pady=20)
+    right_frame = tk.Frame(app, bg="#2d83a5")
+    right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
-    def show_total_videos():
-        total = count_total_videos(data)
-        label.config(text=f"Total Unique Videos: {total}")
 
-    total_button = tk.Button(window, text="Show Total Unique Videos", command=show_total_videos, width=30)
-    total_button.pack(pady=20)
-
-    window.mainloop()
+    app.mainloop()
