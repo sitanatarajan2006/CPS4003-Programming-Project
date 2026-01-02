@@ -6,6 +6,7 @@ from data_loader import *
 from data_processor import *
 from visualisation import *
 from data_exporter import *
+from user_comm import *
 
 # Loading data from CSV file into the program and lets the user know data is loaded
 data = load_data("youtube_trending_videos.csv")
@@ -47,6 +48,7 @@ while True:
     print("4.Show top 10 trending videos")
     print("5.Show pie chart")
     print("6.Show histogram")
+    print("7.Start GUI")
     print("0.Exit")
     choice = input("\nEnter your choice: ")
 
@@ -158,6 +160,10 @@ while True:
             # This is to handle anything other than the valid options in the histogram submenu
             else:
                 print("\nInvalid histogram option.")
+
+    # If the user chooses 7 then start the GUI
+    elif choice == "7":
+        start_gui(data)
 
     # If the user chooses 0 or types "exit" in lower or upper case then exit the program with a message
     elif choice == "0" or choice.lower() == "exit":
