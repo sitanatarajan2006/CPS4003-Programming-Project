@@ -10,11 +10,20 @@ def start_gui(data):
     app.after(100, lambda: app.attributes("-topmost", False))
 
 
-    left_frame = tk.Frame(app, width=500, bg="#0f5875")
+    left_frame = tk.Frame(app, bg="#003a6b")
     left_frame.pack(side=tk.LEFT, fill=tk.Y)
 
-    right_frame = tk.Frame(app, bg="#2d83a5")
+    right_frame = tk.Frame(app, bg="#003a6b")
     right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+
+    menu_area = tk.Frame(left_frame, width=500, bg="#3776a1")
+    menu_area.pack(fill=tk.Y, expand=True, padx=5, pady=5)
+
+    content_area = tk.Frame(right_frame, bg="#5293bb")
+    content_area.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+
+    content_label = tk.Label(content_area, text="Select an option from the menu", bg="#89cff1", fg="#003a6b", font=("Courier New", 16, "bold"), padx=20, pady=20, wraplength=900, justify="left")
+    content_label.pack(pady=20, padx=20, anchor="nw")
 
 
     app.mainloop()
