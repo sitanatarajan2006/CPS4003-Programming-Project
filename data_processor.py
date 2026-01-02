@@ -1,63 +1,68 @@
+def clean_data(data):
+    # Keep only the latest trending entry for each video
+    clean = {}
+    for row in data:
+        video_id = row["video_id"]
+
+        if video_id not in clean:
+            clean[video_id] = row
+        else:
+            if row["trending_date"] > clean[video_id]["trending_date"]:
+                clean[video_id] = row
+    return list(clean.values())
+
+
+
 def count_total_videos(data):
-    return len(data)
+    clean = clean_data(data)
+    return len(clean)
+
 
 def unique_categories(data):
+    # Get unique videos per category
+    clean = clean_data(data)
     category_count = {}
-    for row in data:
+    for row in clean:
         category = row["category_id"]
-        if category in category_count:
-            category_count[category] = category_count[category] + 1
-        else:
+        if category not in category_count:
             category_count[category] = 1
+        else:
+            category_count[category] += 1
     return category_count
 
 def find_video(data, search_value):
     # Find one video by video_id or title
-
-    for row in data:
+    clean = clean_data(data)
+    for row in clean:
         if row["video_id"] == search_value or row["title"] == search_value:
             return row
-
     return None
 
-def get_top_10_by_total_engagement(data):
-    # Rank videos using views + likes + comments
 
-    def score(row):
-        views = int(row["views"])
-        likes = int(row["likes"])
-        comments = int(row["comment_count"])
-        return views + likes + comments
+def top_views(data):
 
-    sorted_videos = sorted(data, key=score, reverse=True)
-    return sorted_videos[:10]
+    clean = clean_data(data)
+
+    sorted_views = sorted(clean, key=lambda row: int(row["views"]), reverse=True)
+    return sorted_views[:10]
 
 
-def get_top_10_by_views(data):
-    # Rank videos by views only
+def top_likes(data):
 
-    def key_func(row):
-        return int(row["views"])
-
-    sorted_videos = sorted(data, key=key_func, reverse=True)
-    return sorted_videos[:10]
+    clean = clean_data(data)
+    sorted_likes = sorted(clean, key=lambda row: int(row["likes"]), reverse=True)
+    return sorted_likes[:10]
 
 
-def get_top_10_by_likes(data):
-    # Rank videos by likes only
+def top_comments(data):
 
-    def key_func(row):
-        return int(row["likes"])
-
-    sorted_videos = sorted(data, key=key_func, reverse=True)
-    return sorted_videos[:10]
+    clean = clean_data(data)
+    sorted_comments = sorted(clean, key=lambda row: int(row["comment_count"]), reverse=True)
+    return sorted_comments[:10]
 
 
-def get_top_10_by_comments(data):
-    # Rank videos by comments only
+def top_engagement(data):
 
-    def key_func(row):
-        return int(row["comment_count"])
-
-    sorted_videos = sorted(data, key=key_func, reverse=True)
-    return sorted_videos[:10]
+    clean = clean_data(data)
+    sorted_engagement = sorted(clean, key=lambda row: int(row["views"]) + int(row["likes"]) + int(row["comment_count"]), reverse=True)
+    return sorted_engagement[:10]
