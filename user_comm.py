@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 from data_processor import *
 from data_exporter import *
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 def start_gui(data):
 
@@ -59,15 +61,67 @@ def start_gui(data):
 
     def show_categories():
         clear_content()
+
+        category_frame = tk.Frame(content_area, bg="#5293bb")
+        category_frame.pack(fill=tk.BOTH, expand=True)
+
+        # ---- TITLE ----
+        title_label = tk.Label(category_frame, text="Videos per Category", font=("Courier New", 18, "bold"), fg="#000000", bg="#5caae9", padx=20, pady=10)
+        title_label.pack(anchor="nw", padx=50, pady=(20, 10))
+
+        # ---- NOTEBOOK (TABS) ----
+        notebook = ttk.Notebook(category_frame)
+        notebook.pack(fill=tk.BOTH, expand=True, padx=40, pady=(0, 20))
+
+        tab_list = ttk.Frame(notebook)
+        tab_pie = ttk.Frame(notebook)
+
+        notebook.add(tab_list, text="List View")
+        notebook.add(tab_pie, text="Pie Chart")
+
+        # ---- DATA ----
         category_counts = unique_categories(data)
-        categories_text = "Number of videos per category:\n\n"
+
+        # ======================
+        # LIST VIEW TAB CONTENT
+        # ======================
+        list_container = tk.Frame(tab_list, bg="#003a6b")
+        list_container.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+
+        list_text = tk.Text(list_container, font=("Courier New", 14, "bold"), bg="#89cff1", fg="#003a6b", wrap=tk.NONE)
+        list_text.pack(fill=tk.BOTH, expand=True)
+
         for category in sorted(category_counts, key=int):
-            categories_text += (
+            list_text.insert(
+                tk.END,
                 f"Category ID {int(category):>3}     :     "
-                f"Video count {category_counts[category]}\n"
-                )
-        categories_label = tk.Label(content_area, text=categories_text, bg="#89cff1", fg="#003a6b", font=("Courier New", 16), padx=20, pady=20, justify="left")
-        categories_label.pack(pady=20, padx=20, anchor="nw")
+                f"Video Count {category_counts[category]}\n"
+            )
+
+        list_text.config(state=tk.DISABLED)
+
+        # ======================
+        # PIE CHART TAB CONTENT
+        # ======================
+        pie_container = tk.Frame(tab_pie, bg="#003a6b")
+        pie_container.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+
+        categories = list(category_counts.keys())
+        counts = list(category_counts.values())
+
+        fig, ax = plt.subplots(figsize=(10, 6))
+        wedges, _ = ax.pie(counts, startangle=90)
+        legend_labels = [f"Category {cat} ({count})"
+            for cat, count in zip(categories, counts)
+        ]
+        ax.legend(wedges, legend_labels, title="Categories ID", loc="center left", bbox_to_anchor=(1, 0.5))
+        ax.set_title("Distribution of Videos by Category", fontsize=16)
+
+        canvas = FigureCanvasTkAgg(fig, master=pie_container)
+        canvas.draw()
+        canvas.get_tk_widget().pack(expand=True)
+
+        plt.close(fig)
     categories_button = tk.Button(menu_area, text="Show Categories", command=show_categories, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
     categories_button.pack(pady=20, padx=20)
 

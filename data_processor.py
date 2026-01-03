@@ -74,7 +74,7 @@ def top_comments(data):
     sorted_comments = sorted(clean, key=lambda row: int(row["comment_count"]), reverse=True)
     return sorted_comments[:10]
 
-
+# Created an engagement matric score which can be displayed to the user
 def engagement_score(video):
     return(int(video["views"]) + int(video["comment_count"]) + int(video["likes"]))
 
