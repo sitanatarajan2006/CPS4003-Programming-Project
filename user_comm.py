@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 from data_processor import *
 from data_exporter import *
 
@@ -6,9 +7,13 @@ def start_gui(data):
 
     app = tk.Tk()
     app.title("Youtube Data Analyser")
-    app.geometry("1600x900")
+    app.geometry("1600x1000")
     app.attributes("-topmost", True)
     app.after(100, lambda: app.attributes("-topmost", False))
+
+    style = ttk.Style()
+    style.configure("TNotebook.Tab", width=45, font=("Courier New", 12, "bold"))
+    style.map("TNotebook.Tab", foreground=[("selected", "#5293bb")])
 
 
     left_frame = tk.Frame(app, bg="#003a6b")
@@ -16,8 +21,9 @@ def start_gui(data):
 
     right_frame = tk.Frame(app, bg="#003a6b")
     right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
-
-    menu_area = tk.Frame(left_frame, width=500, bg="#3776a1")
+    
+    
+    menu_area = tk.Frame(left_frame, width=400, bg="#3776a1")
     menu_area.pack(fill=tk.Y, expand=True, padx=5, pady=5)
     menu_area.pack_propagate(False)
 
@@ -99,8 +105,8 @@ def start_gui(data):
         search_row = tk.Frame(content_area, bg="#89cff1")
         search_row.pack(pady=10, padx=20, anchor="nw")
 
-        search_entry = tk.Entry(search_row, width=50, font=("Courier New", 14))
-        search_entry.pack(side=tk.LEFT, padx=(0,10))
+        search_entry = tk.Entry(search_row, width=68, font=("Courier New", 14))
+        search_entry.pack(side=tk.LEFT, padx=(10,10))
         search_entry.focus()
 
         search_button = tk.Button(search_row, text="Search", command=search, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=15, height=1)
@@ -116,5 +122,81 @@ def start_gui(data):
     find_button = tk.Button(menu_area, text="Find Video", command=find_videos, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
     find_button.pack(pady=20, padx=20)
 
+
+    def show_top_10():
+        clear_content()
+        
+        top10_frame = tk.Frame(content_area, bg="#5293bb")
+        top10_frame.pack(fill=tk.BOTH, expand=True)
+        
+        # ---- NOTEBOOK (TABS AT TOP) ----
+        notebook = ttk.Notebook(top10_frame)
+        notebook.pack(fill=tk.X, padx=40, pady=(20, 10))
+
+        tab_views = ttk.Frame(notebook)
+        tab_likes = ttk.Frame(notebook)
+        tab_comments = ttk.Frame(notebook)
+        tab_engagement = ttk.Frame(notebook)
+
+        notebook.add(tab_views, text="Views")
+        notebook.add(tab_likes, text="Likes")
+        notebook.add(tab_comments, text="Comments")
+        notebook.add(tab_engagement, text="Engagement")
+        
+
+        # ---- DYNAMIC TITLE ----
+        title_label = tk.Label(top10_frame, text="Top 10 Trending Videos by Views", font=("Courier New", 18, "bold"), fg="#000000", bg="#5caae9", padx=20, pady=10)
+        title_label.pack(anchor="nw", padx=50, pady=(10, 5))
+        
+        text_frame = tk.Frame(top10_frame, bg ="#003a6b")
+        text_frame.pack(fill=tk.BOTH, expand=True, padx=50, pady=10)
+    
+        scrollbar = tk.Scrollbar(text_frame)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        content_text = tk.Text(text_frame, font=("Courier New", 14, "bold"), wrap=tk.WORD, yscrollcommand=scrollbar.set, bg="#89cff1", fg="#003a6b")
+        content_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.config(command=content_text.yview)
+        content_text.config(state=tk.DISABLED)
+
+
+        # ---- HELPER TO RENDER TOP 10 ----
+        def render(videos, title_text):
+            title_label.config(text=title_text)
+            text = ""
+            for i, video in enumerate(videos, start=1):
+                text += (
+                    f"{i:>2}. {video['title']}\n"
+                    f"    Views    : {video['views']}\n"
+                    f"    Likes    : {video['likes']}\n"
+                    f"    Comments : {video['comment_count']}\n\n"
+                )
+
+            content_text.config(state=tk.NORMAL)
+            content_text.delete(1.0, tk.END)
+            content_text.insert(tk.END, text)
+            content_text.config(state=tk.DISABLED)
+            content_text.yview_moveto(0)
+
+        # ---- INITIAL LOAD (VIEWS) ----
+        render(top_views(data), "Top 10 Trending Videos by Views")
+
+        # ---- TAB CHANGE HANDLER ----
+        def on_tab_change(event):
+            selected = notebook.index(notebook.select())
+
+            if selected == 0:
+                render(top_views(data), "Top 10 Trending Videos by Views")
+            elif selected == 1:
+                render(top_likes(data), "Top 10 Trending Videos by Likes")
+            elif selected == 2:
+                render(top_comments(data), "Top 10 Trending Videos by Comments")
+            elif selected == 3:
+                render(top_engagement(data), "Top 10 Trending Videos by Engagement")
+
+        notebook.bind("<<NotebookTabChanged>>", on_tab_change)
+
+    top_10_button = tk.Button(menu_area, text="Show Top 10", command=show_top_10, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
+    top_10_button.pack(pady=20, padx=20)
 
     app.mainloop()
