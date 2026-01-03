@@ -85,3 +85,20 @@ def top_engagement(data):
 
     sorted_engagement = sorted(clean, key=lambda video :engagement_score(video), reverse=True)
     return sorted_engagement[:10]
+
+
+def views_list(data):
+    clean = clean_data(data)
+    return [int(video["views"]) for video in clean]
+
+def likes_list(data):
+    clean = clean_data(data)
+    return [int(video["likes"]) for video in clean]
+
+def comments_list(data):
+    clean = clean_data(data)
+    return [int(video["comment_count"]) for video in clean]
+
+def engagement_list(data):
+    clean = clean_data(data)
+    return [engagement_score(video) for video in clean]
