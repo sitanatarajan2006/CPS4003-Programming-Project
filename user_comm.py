@@ -1,5 +1,6 @@
 import tkinter as tk
 from data_processor import *
+from data_exporter import *
 
 def start_gui(data):
 
@@ -63,6 +64,69 @@ def start_gui(data):
         categories_label.pack(pady=20, padx=20, anchor="nw")
     categories_button = tk.Button(menu_area, text="Show Categories", command=show_categories, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
     categories_button.pack(pady=20, padx=20)
+
+
+
+    def find_videos():
+        clear_content()
+        title = tk.Label(content_area, text="Find Video by ID or Title", bg="#89cff1", fg="#003a6b", font=("Courier New", 16), padx=20, pady=20, justify="left")
+        title.pack(pady=10, padx=20, anchor="nw")
+        
+        # search_entry = tk.Entry(content_area, width=50, font=("Courier New", 14))
+        # search_entry.pack(pady=10, padx=20, anchor="nw")
+        # search_entry.focus()
+        
+        
+        
+        found_video = {"data": None}
+        
+        def search():
+            query = search_entry.get().strip()
+            video = find_video(data, query)
+            if video:
+                found_video["data"] = video
+                output = "Video found:\n\n"
+                for key in video:
+                    output += f"{key} : {video[key]}\n"
+                result_label.config(text=output)
+            else:
+                found_video["data"] = None
+                result_label.config(text="Video not found.")
+                
+        # search_button = tk.Button(content_area, text="Search", command=search, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=15, height=1)
+        # search_button.pack(pady=10, padx=20, anchor="nw")
+        # search_button.bind("<Return>", lambda event: search())
+        
+        def export():
+            if found_video["data"]:
+                video = found_video["data"]
+                filename = f"{video['channel_title']}.json"
+                export_json(video, filename)
+            else:
+                result_label.config(text="No video to export.")
+                
+        # export_button = tk.Button(content_area, text="Export to JSON", command=export, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=15, height=1)
+        # export_button.pack(pady=10, padx=20, anchor="ne")
+        search_row = tk.Frame(content_area, bg="#89cff1")
+        search_row.pack(pady=10, padx=20, anchor="nw")
+
+        search_entry = tk.Entry(search_row, width=50, font=("Courier New", 14))
+        search_entry.pack(side=tk.LEFT, padx=(0,10))
+        search_entry.focus()
+        
+        search_button = tk.Button(search_row, text="Search", command=search, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=15, height=1)
+        search_button.pack(side=tk.LEFT)
+        search_button.bind("<Return>", lambda event: search())
+        
+        export_button = tk.Button(search_row, text="Export to JSON", command=export, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=15, height=1)
+        export_button.pack(side=tk.LEFT, padx=(10,0))
+        
+
+        result_label = tk.Label(content_area, text="Search result will appear here", bg="#89cff1", fg="#003a6b", font=("Courier New", 14), padx=20, pady=20, justify="left", wraplength=900)
+        result_label.pack(pady=10, padx=20, anchor="nw")
+        
+    find_button = tk.Button(menu_area, text="Find Video", command=find_videos, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
+    find_button.pack(pady=20, padx=20)
 
 
     app.mainloop()
