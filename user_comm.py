@@ -145,8 +145,14 @@ def start_gui(data):
         
 
         # ---- DYNAMIC TITLE ----
-        title_label = tk.Label(top10_frame, text="Top 10 Trending Videos by Views", font=("Courier New", 18, "bold"), fg="#000000", bg="#5caae9", padx=20, pady=10)
-        title_label.pack(anchor="nw", padx=50, pady=(10, 5))
+        title_row = tk.Frame(top10_frame, bg="#5293bb")
+        title_row.pack(fill=tk.X, padx=50, pady=(10, 5))
+
+        title_label = tk.Label(title_row, text="Top 10 Trending Videos by Views", font=("Courier New", 18, "bold"), fg="#000000", bg="#5caae9", padx=20, pady=10)
+        title_label.pack(side=tk.LEFT)
+
+        export_button = tk.Button(title_row, text="Export", font=("Courier New", 12, "bold"), fg="#000000", bg="#5caae9", padx=15, pady=8)
+        export_button.pack(side=tk.RIGHT)
         
         text_frame = tk.Frame(top10_frame, bg ="#003a6b")
         text_frame.pack(fill=tk.BOTH, expand=True, padx=50, pady=10)
@@ -160,17 +166,22 @@ def start_gui(data):
         content_text.config(state=tk.DISABLED)
 
 
-        # ---- HELPER TO RENDER TOP 10 ----
-        def render(videos, title_text):
+        def render(videos, title_text, show_engagement=False):
             title_label.config(text=title_text)
             text = ""
             for i, video in enumerate(videos, start=1):
+                score = engagement_score(video)
                 text += (
                     f"{i:>2}. {video['title']}\n"
-                    f"    Views    : {video['views']}\n"
-                    f"    Likes    : {video['likes']}\n"
-                    f"    Comments : {video['comment_count']}\n\n"
+                    f"    Views         : {video['views']}\n"
+                    f"    Likes         : {video['likes']}\n"
+                    f"    Comments      : {video['comment_count']}\n"
                 )
+                
+                if show_engagement:
+                    score = engagement_score(video)
+                    text += f"    Engagement    : {score}\n"
+                text += "\n"
 
             content_text.config(state=tk.NORMAL)
             content_text.delete(1.0, tk.END)
@@ -178,21 +189,39 @@ def start_gui(data):
             content_text.config(state=tk.DISABLED)
             content_text.yview_moveto(0)
 
-        # ---- INITIAL LOAD (VIEWS) ----
-        render(top_views(data), "Top 10 Trending Videos by Views")
+        render(top_views(data), "Top 10 Trending Videos by Views", show_engagement=False)
+        
+        def export_top_10():
+            selected = notebook.index(notebook.select())
 
-        # ---- TAB CHANGE HANDLER ----
+            if selected == 0:
+                videos = top_views(data)
+                filename = "top_10_by_views.csv"
+            elif selected == 1:
+                videos = top_likes(data)
+                filename = "top_10_by_likes.csv"
+            elif selected == 2:
+                videos = top_comments(data)
+                filename = "top_10_by_comments.csv"
+            else:
+                videos = top_engagement(data)
+                filename = "top_10_by_engagement.csv"
+
+            export_csv(videos, filename)
+        
+        export_button.config(command=export_top_10)
+
         def on_tab_change(event):
             selected = notebook.index(notebook.select())
 
             if selected == 0:
-                render(top_views(data), "Top 10 Trending Videos by Views")
+                render(top_views(data), "Top 10 Trending Videos by Views", show_engagement=False)
             elif selected == 1:
-                render(top_likes(data), "Top 10 Trending Videos by Likes")
+                render(top_likes(data), "Top 10 Trending Videos by Likes", show_engagement=False)
             elif selected == 2:
-                render(top_comments(data), "Top 10 Trending Videos by Comments")
+                render(top_comments(data), "Top 10 Trending Videos by Comments", show_engagement=False)
             elif selected == 3:
-                render(top_engagement(data), "Top 10 Trending Videos by Engagement")
+                render(top_engagement(data), "Top 10 Trending Videos by Engagement", show_engagement=True)
 
         notebook.bind("<<NotebookTabChanged>>", on_tab_change)
 

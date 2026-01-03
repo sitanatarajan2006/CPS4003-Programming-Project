@@ -75,10 +75,13 @@ def top_comments(data):
     return sorted_comments[:10]
 
 
+def engagement_score(video):
+    return(int(video["views"]) + int(video["comment_count"]) + int(video["likes"]))
+
 # Get top 10 videos by an engagement metric (views + likes + comments) and sort in descending order from most to least
 def top_engagement(data):
 
     clean = clean_data(data)
 
-    sorted_engagement = sorted(clean, key=lambda row: int(row["views"]) + int(row["likes"]) + int(row["comment_count"]), reverse=True)
+    sorted_engagement = sorted(clean, key=lambda video :engagement_score(video), reverse=True)
     return sorted_engagement[:10]
