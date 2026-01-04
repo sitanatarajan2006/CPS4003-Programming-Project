@@ -1,3 +1,4 @@
+# importing tkinter for GUI, matplotlib for visualisations and various modules for data processing and exporting
 import tkinter as tk
 from tkinter import ttk
 from data_processor import *
@@ -8,29 +9,30 @@ from visualisation import *
 
 def start_gui(data):
 
+    # Setting up the main application window's attributes like size, title, opening and exit behavior 
     app = tk.Tk()
     app.title("Youtube Data Analyser")
     app.geometry("1600x1000")
     app.attributes("-topmost", True)
     app.after(100, lambda: app.attributes("-topmost", False))
-    
+
     def on_exit():
         plt.close('all')
         app.destroy()
-    
+
     app.protocol("WM_DELETE_WINDOW", on_exit)
 
+    # ttk styling is used for better appearance of tabs
     style = ttk.Style()
     style.configure("TNotebook.Tab", width=45, font=("Courier New", 12, "bold"))
     style.map("TNotebook.Tab", foreground=[("selected", "#5293bb")])
 
-
+    #laying out the basic app framing with a menu area on the left and content area on the right
     left_frame = tk.Frame(app, bg="#003a6b")
     left_frame.pack(side=tk.LEFT, fill=tk.Y)
 
     right_frame = tk.Frame(app, bg="#003a6b")
     right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
-
 
     menu_area = tk.Frame(left_frame, width=400, bg="#3776a1")
     menu_area.pack(fill=tk.Y, expand=True, padx=5, pady=5)
@@ -43,13 +45,13 @@ def start_gui(data):
     content_label.pack(pady=20, padx=20, anchor="nw")
 
 
-
+    # Function to clear content area, and close any open matplotlib plots
     def clear_content():
         for widget in content_area.winfo_children():
             widget.destroy()
         plt.close('all')
 
-
+    # Home button to reset content area to initial state
     def home():
         clear_content()
         home_label = tk.Label(content_area, text="Select an option from the menu", bg="#89cff1", fg="#003a6b", font=("Courier New", 16), padx=20, pady=20, wraplength=900, justify="left")
@@ -57,7 +59,7 @@ def start_gui(data):
     home_button = tk.Button(menu_area, text="Home", command=home, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=25, height=2, relief="flat")
     home_button.pack(pady=20, padx=20)
 
-
+    # Show total unique videos and channels and setting up a button in menu area
     def show_videos():
         clear_content()
         total_videos = count_total_videos(data)
@@ -68,7 +70,7 @@ def start_gui(data):
     videos_button = tk.Button(menu_area, text="Show Videos", command=show_videos, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
     videos_button.pack(pady=20, padx=20)
 
-
+    # Show categories with list and pie chart by utilising tabs to switch views. Also setting up a button in menu area
     def show_categories():
         clear_content()
 
@@ -126,7 +128,7 @@ def start_gui(data):
     categories_button = tk.Button(menu_area, text="Show Categories", command=show_categories, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
     categories_button.pack(pady=20, padx=20)
 
-
+    # Find video by ID or title and setting up a button in menu area
     def find_videos():
         clear_content()
         title = tk.Label(content_area, text="Find Video by ID or Title", bg="#89cff1", fg="#003a6b", font=("Courier New", 16), padx=20, pady=20, justify="left")
@@ -147,7 +149,7 @@ def start_gui(data):
                 found_video["data"] = None
                 result_label.config(text="Video not found.")
 
-
+        # Export found video to  JSON file
         def export():
             if found_video["data"]:
                 video = found_video["data"]
@@ -176,13 +178,14 @@ def start_gui(data):
     find_button = tk.Button(menu_area, text="Find Video", command=find_videos, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
     find_button.pack(pady=20, padx=20)
 
-
+    # Show top 10 videos by views, likes or comments with tabs to switch views. Also setting up a button in menu area
+    # The view utilises a scrollable text area for better navigation.
     def show_top_10():
         clear_content()
-        
+
         top10_frame = tk.Frame(content_area, bg="#5293bb")
         top10_frame.pack(fill=tk.BOTH, expand=True)
-        
+
         notebook = ttk.Notebook(top10_frame)
         notebook.pack(fill=tk.X, padx=40, pady=(20, 10))
 
@@ -193,7 +196,6 @@ def start_gui(data):
         notebook.add(tab_views, text="Views")
         notebook.add(tab_likes, text="Likes")
         notebook.add(tab_comments, text="Comments")
-        
 
         title_row = tk.Frame(top10_frame, bg="#5293bb")
         title_row.pack(fill=tk.X, padx=50, pady=(10, 5))
@@ -203,19 +205,19 @@ def start_gui(data):
 
         export_button = tk.Button(title_row, text="Export", font=("Courier New", 12, "bold"), fg="#000000", bg="#5caae9", padx=15, pady=8)
         export_button.pack(side=tk.RIGHT)
-        
+
         text_frame = tk.Frame(top10_frame, bg ="#003a6b")
         text_frame.pack(fill=tk.BOTH, expand=True, padx=50, pady=10)
-    
+
         scrollbar = tk.Scrollbar(text_frame)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        
+
         content_text = tk.Text(text_frame, font=("Courier New", 14, "bold"), wrap=tk.WORD, yscrollcommand=scrollbar.set, bg="#89cff1", fg="#003a6b")
         content_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.config(command=content_text.yview)
         content_text.config(state=tk.DISABLED)
 
-
+        # Function to render top 10 videos in the text area
         def render(videos, title_text):
             title_label.config(text=title_text)
             text = ""
@@ -226,7 +228,7 @@ def start_gui(data):
                     f"    Likes         : {video['likes']}\n"
                     f"    Comments      : {video['comment_count']}\n"
                 )
-                
+
             content_text.config(state=tk.NORMAL)
             content_text.delete(1.0, tk.END)
             content_text.insert(tk.END, text)
@@ -268,16 +270,15 @@ def start_gui(data):
     top_10_button = tk.Button(menu_area, text="Show Top 10", command=show_top_10, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
     top_10_button.pack(pady=20, padx=20)
 
-
+    # Show histograms for views, likes and comments with tabs to switch views. Also setting up a button in menu area
     def show_histograms(content_area, data):
-    # Clear content area
+
         for widget in content_area.winfo_children():
             widget.destroy()
 
         container = tk.Frame(content_area, bg="#5293bb")
         container.pack(fill=tk.BOTH, expand=True)
 
-        # Tabs
         notebook = ttk.Notebook(container)
         notebook.pack(fill=tk.X, padx=40, pady=(20, 10))
 
@@ -285,12 +286,10 @@ def start_gui(data):
         tab_likes = ttk.Frame(notebook)
         tab_comments = ttk.Frame(notebook)
 
-
         notebook.add(tab_views, text="Views")
         notebook.add(tab_likes, text="Likes")
         notebook.add(tab_comments, text="Comments")
 
-        # Title
         title_label = tk.Label(
             container,
             text="Histogram",
@@ -301,7 +300,6 @@ def start_gui(data):
         )
         title_label.pack(anchor="nw", padx=50, pady=(10, 5))
 
-        # Plot area
         plot_frame = tk.Frame(container, bg="#003a6b")
         plot_frame.pack(fill=tk.BOTH, expand=True, padx=50, pady=10)
 
@@ -316,7 +314,6 @@ def start_gui(data):
             canvas.draw()
             canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
-        # Initial load
         render(
             [v / 1_000_000 for v in views_list(data)],
             "Distribution of Video Views",
