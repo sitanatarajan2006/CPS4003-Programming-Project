@@ -109,12 +109,12 @@ def average_engagement(data):
         comments = int(video["comment_count"])
 
         if category not in category_totals:
-            category_totals[category] = {"likes": 0, "dislikes": 0, "comments": 0}
+            category_totals[category] = {"total_likes": 0, "total_dislikes": 0, "total_comments": 0}
             category_counts[category] = 0
 
-        category_totals[category]["likes"] += likes
-        category_totals[category]["dislikes"] += dislikes
-        category_totals[category]["comments"] += comments
+        category_totals[category]["total_likes"] += likes
+        category_totals[category]["total_dislikes"] += dislikes
+        category_totals[category]["total_comments"] += comments
         category_counts[category] += 1
 
     metrics = {}

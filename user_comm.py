@@ -77,45 +77,121 @@ def start_gui(data):
         category_frame = tk.Frame(content_area, bg="#5293bb")
         category_frame.pack(fill=tk.BOTH, expand=True)
 
-        title_label = tk.Label(category_frame, text="Videos per Category", font=("Courier New", 18, "bold"), fg="#000000", bg="#5caae9", padx=20, pady=10)
-        title_label.pack(anchor="nw", padx=50, pady=(20, 10))
-
         notebook = ttk.Notebook(category_frame)
-        notebook.pack(fill=tk.BOTH, expand=True, padx=40, pady=(0, 20))
+        notebook.pack(fill=tk.X, padx=40, pady=(20, 10))
 
         tab_list = ttk.Frame(notebook)
         tab_pie = ttk.Frame(notebook)
+        tab_metrics = ttk.Frame(notebook)
 
         notebook.add(tab_list, text="List View")
         notebook.add(tab_pie, text="Pie Chart")
+        notebook.add(tab_metrics, text="Category Metrics")
+
+        content_holder = tk.Frame(category_frame, bg="#5293bb")
+        content_holder.pack(fill=tk.BOTH, expand=True)
+
+        def clear_holder():
+            for widget in content_holder.winfo_children():
+                widget.destroy()
 
         category_counts = unique_categories(data)
+        metrics = average_engagement(data)
 
-        list_container = tk.Frame(tab_list, bg="#003a6b")
-        list_container.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
-        list_text = tk.Text(list_container, font=("Courier New", 14, "bold"), bg="#89cff1", fg="#003a6b", wrap=tk.NONE)
-        list_text.pack(fill=tk.BOTH, expand=True)
+        def render_list_view():
+            clear_holder()
 
-        for category in sorted(category_counts, key=int):
-            list_text.insert(
-                tk.END,
-                f"Category ID {int(category):>3}     :     "
-                f"Video Count {category_counts[category]}\n"
-            )
+            title_row = tk.Frame(content_holder, bg="#5293bb")
+            title_row.pack(fill=tk.X, padx=50, pady=(10, 5))
 
-        list_text.config(state=tk.DISABLED)
+            title_label = tk.Label(title_row, text="Videos per Category", font=("Courier New", 18, "bold"), bg="#5caae9", fg="#000000", padx=20, pady=10)
+            title_label.pack(side=tk.LEFT)
 
-        pie_container = tk.Frame(tab_pie, bg="#003a6b")
-        pie_container.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+            frame = tk.Frame(content_holder, bg="#003a6b")
+            frame.pack(fill=tk.BOTH, expand=True, padx=50, pady=10)
 
-        fig = create_pie(category_counts)
+            scrollbar = tk.Scrollbar(frame)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-        canvas = FigureCanvasTkAgg(fig, master=pie_container)
-        canvas.draw()
-        canvas.get_tk_widget().pack(expand=True)
+            text = tk.Text(frame, font=("Courier New", 14, "bold"), wrap=tk.NONE, yscrollcommand=scrollbar.set, bg="#89cff1", fg="#003a6b")
+            text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            scrollbar.config(command=text.yview)
 
-        plt.close(fig)
+            for category in sorted(category_counts, key=int):
+                text.insert(tk.END, f"Category ID {int(category):>3} : Video Count {category_counts[category]}\n")
+
+            text.config(state=tk.DISABLED)
+
+        def render_pie_chart():
+            clear_holder()
+
+            title_row = tk.Frame(content_holder, bg="#5293bb")
+            title_row.pack(fill=tk.X, padx=50, pady=(10, 5))
+
+            title_label = tk.Label(title_row, text="Category Distribution", font=("Courier New", 18, "bold"), bg="#5caae9", fg="#000000", padx=20, pady=10)
+            title_label.pack(side=tk.LEFT)
+
+            frame = tk.Frame(content_holder, bg="#003a6b")
+            frame.pack(fill=tk.BOTH, expand=True, padx=50, pady=10)
+
+            fig = create_pie(category_counts)
+            canvas = FigureCanvasTkAgg(fig, master=frame)
+            canvas.draw()
+            canvas.get_tk_widget().pack(expand=True)
+            plt.close(fig)
+
+        def render_metrics():
+            clear_holder()
+
+            title_row = tk.Frame(content_holder, bg="#5293bb")
+            title_row.pack(fill=tk.X, padx=50, pady=(10, 5))
+
+            title_label = tk.Label(title_row, text="Category Engagement Metrics", font=("Courier New", 18, "bold"), bg="#5caae9", fg="#000000", padx=20, pady=10)
+            title_label.pack(side=tk.LEFT)
+
+            export_button = tk.Button(title_row, text="Export", font=("Courier New", 12, "bold"), bg="#5caae9", fg="#000000", padx=15, pady=8, command=lambda: export_json(metrics, "category_engagement_metrics.json"))
+            export_button.pack(side=tk.RIGHT)
+
+            frame = tk.Frame(content_holder, bg="#003a6b")
+            frame.pack(fill=tk.BOTH, expand=True, padx=50, pady=10)
+
+            scrollbar = tk.Scrollbar(frame)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+            text = tk.Text(frame, font=("Courier New", 13), wrap=tk.NONE, yscrollcommand=scrollbar.set, bg="#89cff1",fg="#003a6b")
+            text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            scrollbar.config(command=text.yview)
+
+            for category in sorted(metrics, key=int):
+                row = metrics[category]
+                text.insert(
+                    tk.END,
+                    f"Category ID {category}\n"
+                    f"  Total Videos   : {row['total_videos']}\n"
+                    f"  Total Likes    : {row['total_likes']}\n"
+                    f"  Total Dislikes : {row['total_dislikes']}\n"
+                    f"  Total Comments : {row['total_comments']}\n"
+                    f"  Avg Likes      : {row['avg_likes']:.2f}\n"
+                    f"  Avg Dislikes   : {row['avg_dislikes']:.2f}\n"
+                    f"  Avg Comments   : {row['avg_comments']:.2f}\n\n"
+                )
+
+            text.config(state=tk.DISABLED)
+
+        def on_tab_change(event):
+            idx = notebook.index(notebook.select())
+            if idx == 0:
+                render_list_view()
+            elif idx == 1:
+                render_pie_chart()
+            else:
+                render_metrics()
+
+        notebook.bind("<<NotebookTabChanged>>", on_tab_change)
+
+        render_list_view()
+
     categories_button = tk.Button(menu_area, text="Show Categories", command=show_categories, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
     categories_button.pack(pady=20, padx=20)
 
@@ -336,4 +412,7 @@ def start_gui(data):
         notebook.bind("<<NotebookTabChanged>>", on_tab_change)
     histogram_button = tk.Button(menu_area, text="Show Histograms", command=lambda: show_histograms(content_area, data), bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
     histogram_button.pack(pady=20, padx=20)
+    
+    
+
     app.mainloop()
