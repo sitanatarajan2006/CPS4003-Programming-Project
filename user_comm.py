@@ -13,6 +13,12 @@ def start_gui(data):
     app.geometry("1600x1000")
     app.attributes("-topmost", True)
     app.after(100, lambda: app.attributes("-topmost", False))
+    
+    def on_exit():
+        plt.close('all')
+        app.destroy()
+    
+    app.protocol("WM_DELETE_WINDOW", on_exit)
 
     style = ttk.Style()
     style.configure("TNotebook.Tab", width=45, font=("Courier New", 12, "bold"))
@@ -41,6 +47,7 @@ def start_gui(data):
     def clear_content():
         for widget in content_area.winfo_children():
             widget.destroy()
+        plt.close('all')
 
 
     def home():
@@ -299,6 +306,8 @@ def start_gui(data):
         def render(values, title, xlabel):
             for widget in plot_frame.winfo_children():
                 widget.destroy()
+
+            plt.close('all')
 
             fig = create_histogram(values, title, xlabel)
             canvas = FigureCanvasTkAgg(fig, master=plot_frame)
