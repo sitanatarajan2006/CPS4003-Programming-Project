@@ -4,6 +4,7 @@ from data_processor import *
 from data_exporter import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from visualisation import *
 
 def start_gui(data):
 
@@ -23,8 +24,8 @@ def start_gui(data):
 
     right_frame = tk.Frame(app, bg="#003a6b")
     right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
-    
-    
+
+
     menu_area = tk.Frame(left_frame, width=400, bg="#3776a1")
     menu_area.pack(fill=tk.Y, expand=True, padx=5, pady=5)
     menu_area.pack_propagate(False)
@@ -65,11 +66,9 @@ def start_gui(data):
         category_frame = tk.Frame(content_area, bg="#5293bb")
         category_frame.pack(fill=tk.BOTH, expand=True)
 
-        # ---- TITLE ----
         title_label = tk.Label(category_frame, text="Videos per Category", font=("Courier New", 18, "bold"), fg="#000000", bg="#5caae9", padx=20, pady=10)
         title_label.pack(anchor="nw", padx=50, pady=(20, 10))
 
-        # ---- NOTEBOOK (TABS) ----
         notebook = ttk.Notebook(category_frame)
         notebook.pack(fill=tk.BOTH, expand=True, padx=40, pady=(0, 20))
 
@@ -79,12 +78,8 @@ def start_gui(data):
         notebook.add(tab_list, text="List View")
         notebook.add(tab_pie, text="Pie Chart")
 
-        # ---- DATA ----
         category_counts = unique_categories(data)
 
-        # ======================
-        # LIST VIEW TAB CONTENT
-        # ======================
         list_container = tk.Frame(tab_list, bg="#003a6b")
         list_container.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
@@ -100,9 +95,6 @@ def start_gui(data):
 
         list_text.config(state=tk.DISABLED)
 
-        # ======================
-        # PIE CHART TAB CONTENT
-        # ======================
         pie_container = tk.Frame(tab_pie, bg="#003a6b")
         pie_container.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
@@ -124,7 +116,6 @@ def start_gui(data):
         plt.close(fig)
     categories_button = tk.Button(menu_area, text="Show Categories", command=show_categories, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
     categories_button.pack(pady=20, padx=20)
-
 
 
     def find_videos():
@@ -183,22 +174,18 @@ def start_gui(data):
         top10_frame = tk.Frame(content_area, bg="#5293bb")
         top10_frame.pack(fill=tk.BOTH, expand=True)
         
-        # ---- NOTEBOOK (TABS AT TOP) ----
         notebook = ttk.Notebook(top10_frame)
         notebook.pack(fill=tk.X, padx=40, pady=(20, 10))
 
         tab_views = ttk.Frame(notebook)
         tab_likes = ttk.Frame(notebook)
         tab_comments = ttk.Frame(notebook)
-        tab_engagement = ttk.Frame(notebook)
 
         notebook.add(tab_views, text="Views")
         notebook.add(tab_likes, text="Likes")
         notebook.add(tab_comments, text="Comments")
-        notebook.add(tab_engagement, text="Engagement")
         
 
-        # ---- DYNAMIC TITLE ----
         title_row = tk.Frame(top10_frame, bg="#5293bb")
         title_row.pack(fill=tk.X, padx=50, pady=(10, 5))
 
@@ -220,11 +207,10 @@ def start_gui(data):
         content_text.config(state=tk.DISABLED)
 
 
-        def render(videos, title_text, show_engagement=False):
+        def render(videos, title_text):
             title_label.config(text=title_text)
             text = ""
             for i, video in enumerate(videos, start=1):
-                score = engagement_score(video)
                 text += (
                     f"{i:>2}. {video['title']}\n"
                     f"    Views         : {video['views']}\n"
@@ -232,19 +218,14 @@ def start_gui(data):
                     f"    Comments      : {video['comment_count']}\n"
                 )
                 
-                if show_engagement:
-                    score = engagement_score(video)
-                    text += f"    Engagement    : {score}\n"
-                text += "\n"
-
             content_text.config(state=tk.NORMAL)
             content_text.delete(1.0, tk.END)
             content_text.insert(tk.END, text)
             content_text.config(state=tk.DISABLED)
             content_text.yview_moveto(0)
 
-        render(top_views(data), "Top 10 Trending Videos by Views", show_engagement=False)
-        
+        render(top_views(data), "Top 10 Trending Videos by Views")
+
         def export_top_10():
             selected = notebook.index(notebook.select())
 
@@ -254,32 +235,113 @@ def start_gui(data):
             elif selected == 1:
                 videos = top_likes(data)
                 filename = "top_10_by_likes.csv"
-            elif selected == 2:
+            else:
                 videos = top_comments(data)
                 filename = "top_10_by_comments.csv"
-            else:
-                videos = top_engagement(data)
-                filename = "top_10_by_engagement.csv"
 
             export_csv(videos, filename)
-        
+
         export_button.config(command=export_top_10)
 
         def on_tab_change(event):
             selected = notebook.index(notebook.select())
 
             if selected == 0:
-                render(top_views(data), "Top 10 Trending Videos by Views", show_engagement=False)
+                render(top_views(data), "Top 10 Trending Videos by Views")
             elif selected == 1:
-                render(top_likes(data), "Top 10 Trending Videos by Likes", show_engagement=False)
+                render(top_likes(data), "Top 10 Trending Videos by Likes")
             elif selected == 2:
-                render(top_comments(data), "Top 10 Trending Videos by Comments", show_engagement=False)
-            elif selected == 3:
-                render(top_engagement(data), "Top 10 Trending Videos by Engagement", show_engagement=True)
+                render(top_comments(data), "Top 10 Trending Videos by Comments")
+
 
         notebook.bind("<<NotebookTabChanged>>", on_tab_change)
 
     top_10_button = tk.Button(menu_area, text="Show Top 10", command=show_top_10, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
     top_10_button.pack(pady=20, padx=20)
 
+
+    def show_histograms(content_area, data):
+    # Clear content area
+        for widget in content_area.winfo_children():
+            widget.destroy()
+
+        container = tk.Frame(content_area, bg="#5293bb")
+        container.pack(fill=tk.BOTH, expand=True)
+
+        # Tabs
+        notebook = ttk.Notebook(container)
+        notebook.pack(fill=tk.X, padx=40, pady=(20, 10))
+
+        tab_views = ttk.Frame(notebook)
+        tab_likes = ttk.Frame(notebook)
+        tab_comments = ttk.Frame(notebook)
+
+
+        notebook.add(tab_views, text="Views")
+        notebook.add(tab_likes, text="Likes")
+        notebook.add(tab_comments, text="Comments")
+
+        # Title
+        title_label = tk.Label(
+            container,
+            text="Histogram",
+            font=("Courier New", 18, "bold"),
+            bg="#5caae9",
+            padx=20,
+            pady=10
+        )
+        title_label.pack(anchor="nw", padx=50, pady=(10, 5))
+
+        # Plot area
+        plot_frame = tk.Frame(container, bg="#003a6b")
+        plot_frame.pack(fill=tk.BOTH, expand=True, padx=50, pady=10)
+
+        def render(values, title, xlabel):
+            for widget in plot_frame.winfo_children():
+                widget.destroy()
+
+            fig = create_histogram(values, title, xlabel)
+            canvas = FigureCanvasTkAgg(fig, master=plot_frame)
+            canvas.draw()
+            canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+        # Initial load
+        render(
+            [v / 1_000_000 for v in views_list(data)],
+            "Distribution of Video Views",
+            "Views (millions)"
+        )
+        title_label.config(text="Distribution of Video Views")
+
+        def on_tab_change(event):
+            idx = notebook.index(notebook.select())
+
+            if idx == 0:
+                render(
+                    [v / 1_000_000 for v in views_list(data)],
+                    "Distribution of Video Views",
+                    "Views (millions)"
+                )
+                title_label.config(text="Distribution of Video Views")
+
+            elif idx == 1:
+                render(
+                    [v / 10_000 for v in likes_list(data)],
+                    "Distribution of Video Likes",
+                    "Likes (ten-thousands)"
+                )
+                title_label.config(text="Distribution of Video Likes")
+
+            elif idx == 2:
+                render(
+                    [v / 10_000 for v in comments_list(data)],
+                    "Distribution of Video Comments",
+                    "Comments (ten-thousands)"
+                )
+                title_label.config(text="Distribution of Video Comments")
+
+
+        notebook.bind("<<NotebookTabChanged>>", on_tab_change)
+    histogram_button = tk.Button(menu_area, text="Show Histograms", command=lambda: show_histograms(content_area, data), bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
+    histogram_button.pack(pady=20, padx=20)
     app.mainloop()

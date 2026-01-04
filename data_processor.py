@@ -74,18 +74,6 @@ def top_comments(data):
     sorted_comments = sorted(clean, key=lambda row: int(row["comment_count"]), reverse=True)
     return sorted_comments[:10]
 
-# Created an engagement matric score which can be displayed to the user
-def engagement_score(video):
-    return(int(video["views"]) + int(video["comment_count"]) + int(video["likes"]))
-
-# Get top 10 videos by an engagement metric (views + likes + comments) and sort in descending order from most to least
-def top_engagement(data):
-
-    clean = clean_data(data)
-
-    sorted_engagement = sorted(clean, key=lambda video :engagement_score(video), reverse=True)
-    return sorted_engagement[:10]
-
 
 def views_list(data):
     clean = clean_data(data)
@@ -98,7 +86,3 @@ def likes_list(data):
 def comments_list(data):
     clean = clean_data(data)
     return [int(video["comment_count"]) for video in clean]
-
-def engagement_list(data):
-    clean = clean_data(data)
-    return [engagement_score(video) for video in clean]
