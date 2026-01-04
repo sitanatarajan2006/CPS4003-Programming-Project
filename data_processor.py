@@ -95,3 +95,37 @@ def likes_list(data):
 def comments_list(data):
     clean = clean_data(data)
     return [int(video["comment_count"]) for video in clean]
+
+
+def average_engagement(data):
+
+    category_totals = {}
+    category_counts = {}
+
+    for video in data:
+        category = video["category_id"]
+        likes = int(video["likes"])
+        dislikes = int(video["dislikes"])
+        comments = int(video["comment_count"])
+
+        if category not in category_totals:
+            category_totals[category] = {"likes": 0, "dislikes": 0, "comments": 0}
+            category_counts[category] = 0
+
+        category_totals[category]["likes"] += likes
+        category_totals[category]["dislikes"] += dislikes
+        category_totals[category]["comments"] += comments
+        category_counts[category] += 1
+
+    averages = {}
+
+    for category in category_totals:
+        count = category_counts[category]
+
+        averages[category] = {
+            "avg_likes": category_totals[category]["likes"] / count,
+            "avg_dislikes": category_totals[category]["dislikes"] / count,
+            "avg_comments": category_totals[category]["comments"] / count
+        }
+
+    return averages
