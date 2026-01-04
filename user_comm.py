@@ -60,8 +60,10 @@ def start_gui(data):
 
     def show_videos():
         clear_content()
-        total = count_total_videos(data)
-        videos_label = tk.Label(content_area, text=f"Total number of unique videos: {total}", bg="#89cff1", fg="#003a6b", font=("Courier New", 16), padx=20, pady=20, justify="left")
+        total_videos = count_total_videos(data)
+        total_channels = count_total_channels(data)
+        text = f"Total number of unique channels: {total_channels}\n\nTotal number of unique videos: {total_videos}"
+        videos_label = tk.Label(content_area, text=text, bg="#89cff1", fg="#003a6b", font=("Courier New", 16), padx=20, pady=20, justify="left")
         videos_label.pack(pady=20, padx=20, anchor="nw")
     videos_button = tk.Button(menu_area, text="Show Videos", command=show_videos, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
     videos_button.pack(pady=20, padx=20)

@@ -22,6 +22,15 @@ def count_total_videos(data):
 
     return len(clean)
 
+# Count total unique channels in the dataset
+def count_total_channels(data):
+
+    clean = clean_data(data)
+    channels = set()
+
+    for video in clean:
+        channels.add(video["channel_title"])
+    return len(channels)
 
 # Get unique videos per unique category
 def unique_categories(data):
