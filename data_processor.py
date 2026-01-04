@@ -117,15 +117,19 @@ def average_engagement(data):
         category_totals[category]["comments"] += comments
         category_counts[category] += 1
 
-    averages = {}
+    metrics = {}
 
     for category in category_totals:
         count = category_counts[category]
 
-        averages[category] = {
-            "avg_likes": category_totals[category]["likes"] / count,
-            "avg_dislikes": category_totals[category]["dislikes"] / count,
-            "avg_comments": category_totals[category]["comments"] / count
+        metrics[category] = {
+            "total_videos": count,
+            "total_likes": category_totals[category]["total_likes"],
+            "total_dislikes": category_totals[category]["total_dislikes"],
+            "total_comments": category_totals[category]["total_comments"],
+            "avg_likes": category_totals[category]["total_likes"] / count,
+            "avg_dislikes": category_totals[category]["total_dislikes"] / count,
+            "avg_comments": category_totals[category]["total_comments"] / count
         }
 
-    return averages
+    return metrics
