@@ -1,6 +1,7 @@
+#import matplotlib for data visualisation
 import matplotlib.pyplot as plt
 
-
+# Creating a generic function to create histogram plots, that can be reused for views, likes and comments, avioding code duplication
 def create_histogram(values, title, xlabel):
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.hist(values, bins=20)
@@ -10,57 +11,20 @@ def create_histogram(values, title, xlabel):
     fig.tight_layout()
     return fig
 
-
-
-def plot_category_distribution(category_counts, save=False):
+# creating pie chart function for category distribution, this can be imported and used in user_comm.py
+def create_pie(category_counts, title = "Video Distribution by Category"):
     categories = list(category_counts.keys())
     counts = list(category_counts.values())
 
-    plt.figure()
-    plt.pie(counts, labels=categories)
-    plt.title("Video Distribution by Category")
-    plt.show()
+    fig, ax = plt.subplots(figsize=(10, 6))
+    wedges, _ = ax.pie(counts, startangle=90)
 
-def plot_views_histogram(data):
+    legend_labels = [
+        f"Category {cat}: ({count})"
+        for cat, count in zip(categories, counts)
+    ]
+    ax.legend(wedges, legend_labels, title="Categories ID", loc="center left", bbox_to_anchor=(1, 0.5))
+    ax.set_title(title)
+    fig.tight_layout()
+    return fig
 
-    views = []
-
-    for row in data:
-
-        views.append(int(row["views"]) / 1000000)
-
-    plt.figure()
-    plt.hist(views, bins=20)
-    plt.title("Distribution of Video Views")
-    plt.xlabel("Number of Views (millions)")
-    plt.ylabel("Number of Videos")
-    plt.show()
-
-def plot_likes_histogram(data):
-
-    likes = []
-
-    for row in data:
-
-        likes.append(int(row["likes"]) / 10000)
-
-    plt.figure()
-    plt.hist(likes, bins=20)
-    plt.title("Distribution of Video Likes")
-    plt.xlabel("Number of Likes (ten-thousands)")
-    plt.ylabel("Number of Videos")
-    plt.show()
-
-def plot_comments_histogram(data):
-
-    comments = []
-
-    for row in data:
-
-        comments.append(int(row["comment_count"]) / 10000)
-    plt.figure()
-    plt.hist(comments, bins=20)
-    plt.title("Distribution of Video Comments")
-    plt.xlabel("Number of Comments (ten-thousands)")
-    plt.ylabel("Number of Videos")
-    plt.show()

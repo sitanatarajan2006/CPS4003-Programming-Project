@@ -9,7 +9,7 @@ from visualisation import *
 
 def start_gui(data):
 
-    # Setting up the main application window's attributes like size, title, opening and exit behavior 
+    # Setting up the main application window's attributes like size, title, opening and exit behavior
     app = tk.Tk()
     app.title("Youtube Data Analyser")
     app.geometry("1600x1000")
@@ -109,16 +109,7 @@ def start_gui(data):
         pie_container = tk.Frame(tab_pie, bg="#003a6b")
         pie_container.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
-        categories = list(category_counts.keys())
-        counts = list(category_counts.values())
-
-        fig, ax = plt.subplots(figsize=(10, 6))
-        wedges, _ = ax.pie(counts, startangle=90)
-        legend_labels = [f"Category {cat} ({count})"
-            for cat, count in zip(categories, counts)
-        ]
-        ax.legend(wedges, legend_labels, title="Categories ID", loc="center left", bbox_to_anchor=(1, 0.5))
-        ax.set_title("Distribution of Videos by Category", fontsize=16)
+        fig = create_pie(category_counts)
 
         canvas = FigureCanvasTkAgg(fig, master=pie_container)
         canvas.draw()
@@ -290,14 +281,7 @@ def start_gui(data):
         notebook.add(tab_likes, text="Likes")
         notebook.add(tab_comments, text="Comments")
 
-        title_label = tk.Label(
-            container,
-            text="Histogram",
-            font=("Courier New", 18, "bold"),
-            bg="#5caae9",
-            padx=20,
-            pady=10
-        )
+        title_label = tk.Label(container, text="Histogram", font=("Courier New", 18, "bold"), bg="#5caae9", padx=20, pady=10)
         title_label.pack(anchor="nw", padx=50, pady=(10, 5))
 
         plot_frame = tk.Frame(container, bg="#003a6b")
