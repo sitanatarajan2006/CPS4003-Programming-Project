@@ -7,15 +7,15 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from visualisation import *
 
+# Setting up the main application window's attributes like size, title, opening and exit behavior
 def start_gui(data):
-
-    # Setting up the main application window's attributes like size, title, opening and exit behavior
     app = tk.Tk()
     app.title("Youtube Data Analyser")
     app.geometry("1600x1000")
     app.attributes("-topmost", True)
     app.after(100, lambda: app.attributes("-topmost", False))
 
+# This function ensures that all matplotlib plots are closed when the application exits
     def on_exit():
         plt.close('all')
         app.destroy()
@@ -77,45 +77,120 @@ def start_gui(data):
         category_frame = tk.Frame(content_area, bg="#5293bb")
         category_frame.pack(fill=tk.BOTH, expand=True)
 
-        title_label = tk.Label(category_frame, text="Videos per Category", font=("Courier New", 18, "bold"), fg="#000000", bg="#5caae9", padx=20, pady=10)
-        title_label.pack(anchor="nw", padx=50, pady=(20, 10))
-
         notebook = ttk.Notebook(category_frame)
-        notebook.pack(fill=tk.BOTH, expand=True, padx=40, pady=(0, 20))
+        notebook.pack(fill=tk.X, padx=40, pady=(20, 10))
 
         tab_list = ttk.Frame(notebook)
         tab_pie = ttk.Frame(notebook)
+        tab_metrics = ttk.Frame(notebook)
 
         notebook.add(tab_list, text="List View")
         notebook.add(tab_pie, text="Pie Chart")
+        notebook.add(tab_metrics, text="Category Metrics")
+
+        content_holder = tk.Frame(category_frame, bg="#5293bb")
+        content_holder.pack(fill=tk.BOTH, expand=True)
+        def clear_holder():
+            for widget in content_holder.winfo_children():
+                widget.destroy()
 
         category_counts = unique_categories(data)
+        metrics = average_engagement(data)
 
-        list_container = tk.Frame(tab_list, bg="#003a6b")
-        list_container.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+        # This function renders the list view of categories and their video counts
+        def render_list_view():
+            clear_holder()
 
-        list_text = tk.Text(list_container, font=("Courier New", 14, "bold"), bg="#89cff1", fg="#003a6b", wrap=tk.NONE)
-        list_text.pack(fill=tk.BOTH, expand=True)
+            title_row = tk.Frame(content_holder, bg="#5293bb")
+            title_row.pack(fill=tk.X, padx=50, pady=(10, 5))
 
-        for category in sorted(category_counts, key=int):
-            list_text.insert(
-                tk.END,
-                f"Category ID {int(category):>3}     :     "
-                f"Video Count {category_counts[category]}\n"
-            )
+            title_label = tk.Label(title_row, text="Videos per Category", font=("Courier New", 18, "bold"), bg="#5caae9", fg="#000000", padx=20, pady=10)
+            title_label.pack(side=tk.LEFT)
 
-        list_text.config(state=tk.DISABLED)
+            frame = tk.Frame(content_holder, bg="#003a6b")
+            frame.pack(fill=tk.BOTH, expand=True, padx=50, pady=10)
 
-        pie_container = tk.Frame(tab_pie, bg="#003a6b")
-        pie_container.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+            scrollbar = tk.Scrollbar(frame)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-        fig = create_pie(category_counts)
+            text = tk.Text(frame, font=("Courier New", 14, "bold"), wrap=tk.NONE, yscrollcommand=scrollbar.set, bg="#89cff1", fg="#003a6b")
+            text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            scrollbar.config(command=text.yview)
 
-        canvas = FigureCanvasTkAgg(fig, master=pie_container)
-        canvas.draw()
-        canvas.get_tk_widget().pack(expand=True)
+            for category in sorted(category_counts, key=int):
+                text.insert(tk.END, f"Category ID {int(category):>3} : Video Count {category_counts[category]}\n")
 
-        plt.close(fig)
+            text.config(state=tk.DISABLED)
+        # This function renders the pie chart view of category distribution
+        def render_pie_chart():
+            clear_holder()
+
+            title_row = tk.Frame(content_holder, bg="#5293bb")
+            title_row.pack(fill=tk.X, padx=50, pady=(10, 5))
+
+            title_label = tk.Label(title_row, text="Category Distribution", font=("Courier New", 18, "bold"), bg="#5caae9", fg="#000000", padx=20, pady=10)
+            title_label.pack(side=tk.LEFT)
+
+            frame = tk.Frame(content_holder, bg="#003a6b")
+            frame.pack(fill=tk.BOTH, expand=True, padx=50, pady=10)
+
+            fig = create_pie(category_counts)
+            canvas = FigureCanvasTkAgg(fig, master=frame)
+            canvas.draw()
+            canvas.get_tk_widget().pack(expand=True)
+            plt.close(fig)
+        # This function renders the category engagement metrics in a scrollable text area
+        def render_metrics():
+            clear_holder()
+
+            title_row = tk.Frame(content_holder, bg="#5293bb")
+            title_row.pack(fill=tk.X, padx=50, pady=(10, 5))
+
+            title_label = tk.Label(title_row, text="Category Engagement Metrics", font=("Courier New", 18, "bold"), bg="#5caae9", fg="#000000", padx=20, pady=10)
+            title_label.pack(side=tk.LEFT)
+
+            export_button = tk.Button(title_row, text="Export", font=("Courier New", 12, "bold"), bg="#5caae9", fg="#000000", padx=15, pady=8, command=lambda: export_json(metrics, "category_engagement_metrics.json"))
+            export_button.pack(side=tk.RIGHT)
+
+            frame = tk.Frame(content_holder, bg="#003a6b")
+            frame.pack(fill=tk.BOTH, expand=True, padx=50, pady=10)
+
+            scrollbar = tk.Scrollbar(frame)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+            text = tk.Text(frame, font=("Courier New", 13), wrap=tk.NONE, yscrollcommand=scrollbar.set, bg="#89cff1",fg="#003a6b")
+            text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            scrollbar.config(command=text.yview)
+
+            for category in sorted(metrics, key=int):
+                row = metrics[category]
+                text.insert(
+                    tk.END,
+                    f"Category ID {category}\n"
+                    f"  Total Videos   : {row['total_videos']}\n"
+                    f"  Total Likes    : {row['total_likes']}\n"
+                    f"  Total Dislikes : {row['total_dislikes']}\n"
+                    f"  Total Comments : {row['total_comments']}\n"
+                    f"  Avg Likes      : {row['avg_likes']:.2f}\n"
+                    f"  Avg Dislikes   : {row['avg_dislikes']:.2f}\n"
+                    f"  Avg Comments   : {row['avg_comments']:.2f}\n\n"
+                )
+
+            text.config(state=tk.DISABLED)
+        # This function handles tab changes and calls the appropriate render function
+        def on_tab_change(event):
+            idx = notebook.index(notebook.select())
+            if idx == 0:
+                render_list_view()
+            elif idx == 1:
+                render_pie_chart()
+            else:
+                render_metrics()
+
+        notebook.bind("<<NotebookTabChanged>>", on_tab_change)
+
+        render_list_view()
+
     categories_button = tk.Button(menu_area, text="Show Categories", command=show_categories, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
     categories_button.pack(pady=20, padx=20)
 
@@ -227,7 +302,7 @@ def start_gui(data):
             content_text.yview_moveto(0)
 
         render(top_views(data), "Top 10 Trending Videos by Views")
-
+        # This function exports the top 10 videos based on the selected tab to a CSV file
         def export_top_10():
             selected = notebook.index(notebook.select())
 
@@ -244,7 +319,7 @@ def start_gui(data):
             export_csv(videos, filename)
 
         export_button.config(command=export_top_10)
-
+        # This function handles tab changes and calls the appropriate render function
         def on_tab_change(event):
             selected = notebook.index(notebook.select())
 
@@ -336,4 +411,63 @@ def start_gui(data):
         notebook.bind("<<NotebookTabChanged>>", on_tab_change)
     histogram_button = tk.Button(menu_area, text="Show Histograms", command=lambda: show_histograms(content_area, data), bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
     histogram_button.pack(pady=20, padx=20)
+
+    # Show trending duration analysis with line plot and setting up a button in menu area
+    # This function displays a line plot showing average trending duration per category over time
+    def show_trending():
+        clear_content()
+
+        trending_frame = tk.Frame(content_area, bg="#5293bb")
+        trending_frame.pack(fill=tk.BOTH, expand=True)
+
+        title_row = tk.Frame(trending_frame, bg="#5293bb")
+        title_row.pack(fill=tk.X, padx=50, pady=(20, 10))
+
+        title_label = tk.Label(
+            title_row,
+            text="Average Trending Duration per Category Over Time",
+            font=("Courier New", 18, "bold"),
+            fg="#003a6b",
+            bg="#5caae9",
+            padx=20,
+            pady=10
+        )
+        title_label.pack(side=tk.LEFT)
+
+        plot_frame = tk.Frame(trending_frame, bg="#003a6b")
+        plot_frame.pack(fill=tk.BOTH, expand=True, padx=50, pady=10)
+
+
+        category_data = avg_duration_category(data)
+
+        fig, ax = plt.subplots(figsize=(12, 6))
+
+        categories_sorted = sorted(
+            category_data.items(),
+            key=lambda item: len(item[1]),
+            reverse=True
+        )
+        top_categories = categories_sorted[:5]
+
+        for category, date_values in top_categories:
+            dates = sorted(date_values.keys())
+            avgs = [date_values[d] for d in dates]
+            ax.plot(dates, avgs, label=f"Category {category}")
+
+        ax.set_title("Average Trending Duration per Category Over Time")
+        ax.set_xlabel("Trending Date")
+        ax.set_ylabel("Average Trending Duration (days)")
+        ax.legend()
+        fig.autofmt_xdate(rotation=45)
+        fig.tight_layout()
+
+        canvas = FigureCanvasTkAgg(fig, master=plot_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+        plt.close(fig)
+
+    trending_button = tk.Button(menu_area, text="Trending Analysis", command=show_trending, bg="#89cff1", fg="#003a6b", font=("Courier New", 14, "bold"), width=20, height=1)
+    trending_button.pack(pady=20, padx=20)
+
     app.mainloop()
