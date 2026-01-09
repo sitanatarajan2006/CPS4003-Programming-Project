@@ -14,8 +14,7 @@ def clean_data(data):
     return list(clean.values())
 
 
-
-# Count total unique videos in the dataset
+# Count total unique videos in the dataset and returns the count
 def count_total_videos(data):
 
     clean = clean_data(data)
@@ -83,7 +82,7 @@ def top_comments(data):
     sorted_comments = sorted(clean, key=lambda row: int(row["comment_count"]), reverse=True)
     return sorted_comments[:10]
 
-
+# Get lists of views, likes, and comments for all videos
 def views_list(data):
     clean = clean_data(data)
     return [int(video["views"]) for video in clean]
@@ -96,7 +95,7 @@ def comments_list(data):
     clean = clean_data(data)
     return [int(video["comment_count"]) for video in clean]
 
-
+# Calculate average likes, dislikes, and comments per category
 def average_engagement(data):
 
     category_totals = {}
@@ -133,3 +132,63 @@ def average_engagement(data):
         }
 
     return metrics
+# This function calculates the duration each video has been trending
+def video_duration(data):
+
+    video_dates = {}
+
+    for row in data:
+        video_id = row["video_id"]
+        trending_date = row["trending_date"]
+
+        if video_id not in video_dates:
+            video_dates[video_id] = {
+                "title": row["title"],
+                "category_id": row["category_id"],
+                "dates": set()
+            }
+
+        video_dates[video_id]["dates"].add(trending_date)
+
+    results = {}
+
+    for video_id, info in video_dates.items():
+        results[video_id] = {
+            "title": info["title"],
+            "category_id": info["category_id"],
+            "trending_days": len(info["dates"])
+        }
+
+    return results
+# This def function calculates average duration videos trend per category per trending date
+def avg_duration_category(data):
+
+    durations = video_duration(data)
+
+    date_category = {}
+
+    for row in data:
+        date = row["trending_date"]
+        category = row["category_id"]
+        video_id = row["video_id"]
+
+        if date not in date_category:
+            date_category[date] = {}
+
+        if category not in date_category[date]:
+            date_category[date][category] = []
+
+        date_category[date][category].append(
+            durations[video_id]["trending_days"]
+        )
+
+    results = {}
+
+    for date, categories in date_category.items():
+        for category, values in categories.items():
+            if category not in results:
+                results[category] = {}
+
+            results[category][date] = sum(values) / len(values)
+
+    return results
