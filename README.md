@@ -12,16 +12,19 @@ When the program starts, a graphical user interface (GUI) opens. The interface i
 
 
 ---Home---
+
 Returns the user to the welcome screen, can be used to return to home.
 
 
 
 ---Show Videos---
+
 Displays the total number of unique videos and total number of unique channels in the dataset.
 
 
 
 ---Show Categories---
+
 This option shows how videos are distributed across categories and contains 3 tabs:
 
 - List View Tab
@@ -44,6 +47,7 @@ Includes an Export to JSON button, which saves the selected video’s data as a 
 
 
 ---Show Top 10---
+
 This section displays the most popular videos based on different engagement metrics and contains multiple tabs:
 
 - Views Tab
@@ -61,6 +65,7 @@ Export button will export the currently selected top 10 list to a CSV file.
 
 
 ---Show Histograms---
+
 This option visualises engagement data using histograms and contains four tabs:
 
 - Views Tab
