@@ -9,14 +9,16 @@ The graphical user interface (GUI) is then launched with the loaded data.
 
 When the program starts, a graphical user interface (GUI) opens. The interface is divided into a menu panel on the left and a content area on the right. Users interact with the program by clicking buttons and switching between tabs.
 
-Home
-Returns the user to the welcome screen, can be used to return to home.
 
+
+---Home---
+Returns the user to the welcome screen, can be used to return to home.
 
 
 
 ---Show Videos---
 Displays the total number of unique videos and total number of unique channels in the dataset.
+
 
 
 ---Show Categories---
@@ -30,6 +32,7 @@ Displays a pie chart visualising the distribution of videos across categories.
 
 - Category metrics Tab
 Shows relevent category metrics for each tab and can be exported
+
 
 
 ---Find Video---
@@ -68,6 +71,7 @@ Displays a histogram showing the distribution of video likes.
 
 - Comments Tab
 Displays a histogram showing the distribution of video comments.
+
 
 
 ---Trending Analysis---
